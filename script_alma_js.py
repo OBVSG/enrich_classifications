@@ -33,4 +33,5 @@ for xml_file in glob.glob(f"{args.input_xml_dir}*.xml"):
     new_marcrecord = enrich_cls.enrich_bib(marcrecord, ddc_to_bk=ddc_bk_map, ddc_to_obv=ddc_obv_map)
     if new_marcrecord:
         marcrecord = new_marcrecord
+        ET.indent(tree)
         tree.write(f"{args.output_xml_dir}{basename(xml_file)}", encoding="utf-8", xml_declaration=True)
