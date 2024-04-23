@@ -30,12 +30,28 @@ def gen_datafield(tag, ind1, ind2, subfields):
 
 def enrich_bib(bib_element, ddc_to_bk, ddc_to_obv):
     update_flag = False
-    mms = bib_element.find("./controlfield[@tag='001']").text
-    df084 = bib_element.find("./datafield[@tag='084']")
-    df970 = bib_element.find("./datafield[@tag='970']")
-    for df082a in bib_element.findall("./datafield[@tag='082']/subfield[@code='a']"):
-        dewey = df082a.text[:3]
-        if (bk_list := ddc_to_bk.get(dewey)) and df084 is None:
+    df084_is_here = False
+    df970_is_here = False
+    df084__ = bib_element.find("./datafield[@tag='084'][@ind1=' '][@ind2=' ']")
+    df9701_ = bib_element.find("./datafield[@tag='970'][@ind1='1'][@ind2=' ']")
+    df08204a = bib_element.find(
+        "./datafield[@tag='082'][@ind1='0'][@ind2='4']/subfield[@code='a']"
+    )
+    if (
+        df084__ is not None
+        and (sf2 := df084__.find("./subfield[@code='2']")) is not None
+        and sf2.text == "bkl"
+    ):
+        df084_is_here = True
+    if (
+        df9701_ is not None
+        and df9701_.find("./subfield[@code='c']") is not None
+    ):
+        df970_is_here = True
+
+    if df08204a is not None:
+        dewey = df08204a.text[:3]
+        if (bk_list := ddc_to_bk.get(dewey)) and not df084_is_here:
             update_flag = True
             for bk in bk_list:
                 bib_element.append(
@@ -50,7 +66,7 @@ def enrich_bib(bib_element, ddc_to_bk, ddc_to_obv):
                         ],
                     )
                 )
-        if (obv_list := ddc_to_obv.get(dewey)) and df970 is None:
+        if (obv_list := ddc_to_obv.get(dewey)) and not df970_is_here:
             update_flag = True
             for fg in obv_list:
                 bib_element.append(
