@@ -1,19 +1,21 @@
 import csv
+import requests
 import xml.etree.ElementTree as ET
 
 
-def create_notation_map(csv_file):
+def create_notation_map_via_download(url):
     notation_map = dict()
-    with open(csv_file, newline="") as f:
-        reader = csv.reader(f)
-        header = next(reader)
-        from_index = header.index("fromNotation")
-        to_indices = [header.index(col) for col in header if "toNotation" in col]
-        for line in reader:
-            to_notations = notation_map.get(line[from_index], [])
-            to_notations += [line[i] for i in to_indices if line[i]]
-            notation_map[line[from_index]] = to_notations
-        return notation_map
+    r = requests.get(url)
+    csv_data = r.text.splitlines()
+    reader = csv.reader(csv_data)
+    header = next(reader)
+    from_index = header.index("fromNotation")
+    to_indices = [header.index(col) for col in header if "toNotation" in col]
+    for line in reader:
+        to_notations = notation_map.get(line[from_index], [])
+        to_notations += [line[i] for i in to_indices if line[i]]
+        notation_map[line[from_index]] = to_notations
+    return notation_map
 
 
 def gen_datafield(tag, ind1, ind2, subfields):
@@ -61,7 +63,7 @@ def enrich_bib(bib_element, ddc_to_bk, ddc_to_obv):
                         " ",
                         [
                             ("a", bk),
-                            ("9", "Automatisch generiert aus Konkordanz DDC-BK (UBG)"),
+                            ("9", "O: Automatisch generiert aus Konkordanz DDC-BK (UBG)"),
                             ("2", "bkl"),
                         ],
                     )
