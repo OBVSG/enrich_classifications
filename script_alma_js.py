@@ -14,17 +14,16 @@ parser.add_argument(
 parser.add_argument(
     "output_xml_dir", type=str, help="Output directory to write files to"
 )
-parser.add_argument(
-    "ddc_bk_csv", type=Path, help="File to with csv mappping table ddc bk"
-)
-parser.add_argument(
-    "ddc_obv_csv", type=Path, help="File to with csv mapping table ddc obv"
-)
 
 args = parser.parse_args()
 
-ddc_bk_map = enrich_cls.create_notation_map(args.ddc_bk_csv)
-ddc_obv_map = enrich_cls.create_notation_map(args.ddc_obv_csv)
+DDC_BK_URL = "https://coli-conc.gbv.de/api/mappings?partOf=https%3A%2F%2Fcoli-conc.gbv.de%2Fapi%2Fconcordances%2Fddc-bk-1000-ubg&download=csv"
+DDC_OBV_URL = "https://coli-conc.gbv.de/api/mappings?partOf=https%3A%2F%2Fcoli-conc.gbv.de%2Fapi%2Fconcordances%2Fddc-obv&download=csv"
+
+ddc_bk_map = enrich_cls.create_notation_map_via_download(DDC_BK_URL)
+ddc_obv_map = enrich_cls.create_notation_map_via_download(DDC_OBV_URL)
+
+print(ddc_bk_map)
 
 for xml_file in glob.glob(f"{args.input_xml_dir}*.xml"):
     tree = ET.parse(xml_file)
