@@ -1,9 +1,10 @@
 import csv
 import requests
 import xml.etree.ElementTree as ET
+from typing import Union
 
 
-def create_notation_map_via_download(url):
+def create_notation_map_via_download(url: str) -> dict:
     notation_map = dict()
     r = requests.get(url)
     csv_data = r.text.splitlines()
@@ -18,7 +19,7 @@ def create_notation_map_via_download(url):
     return notation_map
 
 
-def gen_datafield(tag, ind1, ind2, subfields):
+def gen_datafield(tag: str, ind1: str, ind2: str, subfields: list) -> ET.Element:
     """
     Generate a datafield
     Subfields: list of tuples with (code, value) pairs
@@ -30,7 +31,9 @@ def gen_datafield(tag, ind1, ind2, subfields):
     return df
 
 
-def enrich_bib(bib_element, ddc_to_bk, ddc_to_obv):
+def enrich_bib(
+    bib_element: ET.Element, ddc_to_bk: dict, ddc_to_obv: dict
+) -> Union[ET.Element, None]:
     update_flag = False
     df084_is_here = False
     df970_is_here = False
@@ -45,12 +48,8 @@ def enrich_bib(bib_element, ddc_to_bk, ddc_to_obv):
         and sf2.text == "bkl"
     ):
         df084_is_here = True
-    if (
-        df9701_ is not None
-        and df9701_.find("./subfield[@code='c']") is not None
-    ):
+    if df9701_ is not None and df9701_.find("./subfield[@code='c']") is not None:
         df970_is_here = True
-
     if df08204a is not None:
         dewey = df08204a.text[:3]
         if (bk_list := ddc_to_bk.get(dewey)) and not df084_is_here:
@@ -63,7 +62,10 @@ def enrich_bib(bib_element, ddc_to_bk, ddc_to_obv):
                         " ",
                         [
                             ("a", bk),
-                            ("9", "O: Automatisch generiert aus Konkordanz DDC-BK (UBG)"),
+                            (
+                                "9",
+                                "O: Automatisch generiert aus Konkordanz DDC-BK (UBG)",
+                            ),
                             ("2", "bkl"),
                         ],
                     )
