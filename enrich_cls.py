@@ -62,11 +62,11 @@ def enrich_bib(
                         " ",
                         [
                             ("a", bk),
+                            ("2", "bkl"),
                             (
                                 "9",
                                 "O: Automatisch generiert aus Konkordanz DDC-BK (UBG)",
-                            ),
-                            ("2", "bkl"),
+                            )
                         ],
                     )
                 )
