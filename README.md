@@ -1,12 +1,12 @@
 # Enrich Classifications
 
-Marc XML Bibliographic Records of E-Books often come Dewey Classification. Based on concordances
+Marc XML Bibliographic Records of E-Books often come with a Dewey Classification. Based on concordances
 
 https://coli-conc.gbv.de/api/concordances/ddc-obv
 
 https://coli-conc.gbv.de/api/concordances/ddc-bk-1000-ubg
 
-one can enrich BK and OBV Classifcation for a given Marc XML <record/> Element.
+one can enrich BK and OBV Classification for a given Marc XML `<record/>` Element.
 
 # Usage `script_alma_js.py`
 
