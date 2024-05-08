@@ -24,7 +24,9 @@ DDC_OBV_URL = "https://coli-conc.gbv.de/api/mappings?partOf=https%3A%2F%2Fcoli-c
 ddc_bk_map = enrich_cls.create_notation_map_via_download(DDC_BK_URL)
 ddc_obv_map = enrich_cls.create_notation_map_via_download(DDC_OBV_URL)
 
+print(f"Downloaded {len(ddc_bk_map)} mappings for BK and {len(ddc_obv_map)} mappings for OBV")
 
+counter = 0
 for xml_file in glob.glob(f"{args.input_xml_dir}*.xml"):
     tree = ET.parse(xml_file)
     root = tree.getroot()
@@ -40,3 +42,6 @@ for xml_file in glob.glob(f"{args.input_xml_dir}*.xml"):
             encoding="utf-8",
             xml_declaration=True,
         )
+        counter += 1
+
+print(f"Enriched {counter} records")
