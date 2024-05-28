@@ -1,21 +1,36 @@
-import csv
+import json
 import requests
 import xml.etree.ElementTree as ET
-from typing import Union
 
 
-def create_notation_map_via_download(url: str) -> dict:
+COLI_CONC_BASE_URL = "https://coli-conc.gbv.de/api/"
+
+
+def get_concordance(session: requests.Session, id: str) -> requests.Response:
+    return session.get(f"{COLI_CONC_BASE_URL}concordances/{id}")
+
+
+def download_concordance(
+    session: requests.Session, id: str, mimetype="application/x-ndjson; charset=utf-8"
+) -> str | None:
+    concordance = get_concordance(session, id)
+    concordance = concordance.json()
+    for dist in concordance.get("distributions"):
+        if dist.get("mimetype") == mimetype:
+            mappings = session.get(dist.get("download"))
+            return mappings.text
+    return None
+
+
+def create_notation_map(concordance: str) -> dict[str, list]:
     notation_map = dict()
-    r = requests.get(url)
-    csv_data = r.text.splitlines()
-    reader = csv.reader(csv_data)
-    header = next(reader)
-    from_index = header.index("fromNotation")
-    to_indices = [header.index(col) for col in header if "toNotation" in col]
-    for line in reader:
-        to_notations = notation_map.get(line[from_index], [])
-        to_notations += [line[i] for i in to_indices if line[i]]
-        notation_map[line[from_index]] = to_notations
+    for line in concordance.splitlines():
+        mapping = json.loads(line.strip())
+        from_notation = mapping.get("from").get("memberSet")[0].get("notation")[0]
+        to_notation = mapping.get("to").get("memberSet")[0].get("notation")
+        to_notations = notation_map.get(from_notation, [])
+        to_notations += to_notation
+        notation_map[from_notation] = to_notations
     return notation_map
 
 
@@ -33,7 +48,7 @@ def gen_datafield(tag: str, ind1: str, ind2: str, subfields: list) -> ET.Element
 
 def enrich_bib(
     bib_element: ET.Element, ddc_to_bk: dict, ddc_to_obv: dict
-) -> Union[ET.Element, None]:
+) -> ET.Element | None:
     update_flag = False
     df084_is_here = False
     df970_is_here = False
@@ -66,7 +81,7 @@ def enrich_bib(
                             (
                                 "9",
                                 "O: Automatisch generiert aus Konkordanz DDC-BK (UBG)",
-                            )
+                            ),
                         ],
                     )
                 )
