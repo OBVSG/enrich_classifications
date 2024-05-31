@@ -52,17 +52,17 @@ def enrich_bib(
     update_flag = False
     df084_is_here = False
     df970_is_here = False
-    df084__ = bib_element.find("./datafield[@tag='084'][@ind1=' '][@ind2=' ']")
+    df084__fields = bib_element.findall("./datafield[@tag='084'][@ind1=' '][@ind2=' ']")
     df9701_ = bib_element.find("./datafield[@tag='970'][@ind1='1'][@ind2=' ']")
     df08204a = bib_element.find(
         "./datafield[@tag='082'][@ind1='0'][@ind2='4']/subfield[@code='a']"
     )
-    if (
-        df084__ is not None
-        and (sf2 := df084__.find("./subfield[@code='2']")) is not None
-        and sf2.text == "bkl"
-    ):
-        df084_is_here = True
+    for df084__ in df084__fields:
+        if (
+            (sf2 := df084__.find("./subfield[@code='2']")) is not None
+            and sf2.text == "bkl"
+        ):
+            df084_is_here = True
     if df9701_ is not None and df9701_.find("./subfield[@code='c']") is not None:
         df970_is_here = True
     if df08204a is not None:
