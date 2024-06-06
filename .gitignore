@@ -1,4 +1,7 @@
 __pycache__/
 data/
+build/
+dist/
+*.egg-info/
 *.csv
 *.log
