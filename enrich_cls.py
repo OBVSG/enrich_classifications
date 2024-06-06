@@ -1,7 +1,7 @@
 import json
-import requests
 import xml.etree.ElementTree as ET
 
+import requests
 
 COLI_CONC_BASE_URL = "https://coli-conc.gbv.de/api/"
 
@@ -11,7 +11,7 @@ def get_concordance(session: requests.Session, id: str) -> requests.Response:
 
 
 def download_concordance(
-    session: requests.Session, id: str, mimetype="application/x-ndjson; charset=utf-8"
+    session: requests.Session, id: str, mimetype="application/x-ndjson; charset=utf-8",
 ) -> str | None:
     concordance = get_concordance(session, id)
     concordance = concordance.json()
@@ -23,7 +23,7 @@ def download_concordance(
 
 
 def create_notation_map(concordance: str) -> dict[str, list]:
-    notation_map = dict()
+    notation_map = {}
     for line in concordance.splitlines():
         mapping = json.loads(line.strip())
         from_notation = mapping.get("from").get("memberSet")[0].get("notation")[0]
@@ -35,8 +35,7 @@ def create_notation_map(concordance: str) -> dict[str, list]:
 
 
 def gen_datafield(tag: str, ind1: str, ind2: str, subfields: list) -> ET.Element:
-    """
-    Generate a datafield
+    """Generate a datafield
     Subfields: list of tuples with (code, value) pairs
     """
     df = ET.Element("datafield", {"tag": tag, "ind1": ind1, "ind2": ind2})
@@ -47,7 +46,7 @@ def gen_datafield(tag: str, ind1: str, ind2: str, subfields: list) -> ET.Element
 
 
 def enrich_bib(
-    bib_element: ET.Element, ddc_to_bk: dict, ddc_to_obv: dict
+    bib_element: ET.Element, ddc_to_bk: dict, ddc_to_obv: dict,
 ) -> ET.Element | None:
     update_flag = False
     df084_is_here = False
@@ -55,7 +54,7 @@ def enrich_bib(
     df084__fields = bib_element.findall("./datafield[@tag='084'][@ind1=' '][@ind2=' ']")
     df9701_ = bib_element.find("./datafield[@tag='970'][@ind1='1'][@ind2=' ']")
     df08204a = bib_element.find(
-        "./datafield[@tag='082'][@ind1='0'][@ind2='4']/subfield[@code='a']"
+        "./datafield[@tag='082'][@ind1='0'][@ind2='4']/subfield[@code='a']",
     )
     for df084__ in df084__fields:
         if (
@@ -83,7 +82,7 @@ def enrich_bib(
                                 "O: Automatisch generiert aus Konkordanz DDC-BK (UBG)",
                             ),
                         ],
-                    )
+                    ),
                 )
         if (obv_list := ddc_to_obv.get(dewey)) and not df970_is_here:
             update_flag = True
@@ -94,8 +93,8 @@ def enrich_bib(
                         "1",
                         " ",
                         [("c", fg)],
-                    )
+                    ),
                 )
     if update_flag:
         return bib_element
-    return
+    return None
