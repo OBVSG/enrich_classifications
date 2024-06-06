@@ -11,7 +11,9 @@ def get_concordance(session: requests.Session, id: str) -> requests.Response:
 
 
 def download_concordance(
-    session: requests.Session, id: str, mimetype="application/x-ndjson; charset=utf-8",
+    session: requests.Session,
+    id: str,
+    mimetype="application/x-ndjson; charset=utf-8",
 ) -> str | None:
     concordance = get_concordance(session, id)
     concordance = concordance.json()
@@ -46,7 +48,9 @@ def gen_datafield(tag: str, ind1: str, ind2: str, subfields: list) -> ET.Element
 
 
 def enrich_bib(
-    bib_element: ET.Element, ddc_to_bk: dict, ddc_to_obv: dict,
+    bib_element: ET.Element,
+    ddc_to_bk: dict,
+    ddc_to_obv: dict,
 ) -> ET.Element | None:
     update_flag = False
     df084_is_here = False
@@ -58,9 +62,8 @@ def enrich_bib(
     )
     for df084__ in df084__fields:
         if (
-            (sf2 := df084__.find("./subfield[@code='2']")) is not None
-            and sf2.text == "bkl"
-        ):
+            sf2 := df084__.find("./subfield[@code='2']")
+        ) is not None and sf2.text == "bkl":
             df084_is_here = True
     if df9701_ is not None and df9701_.find("./subfield[@code='c']") is not None:
         df970_is_here = True
