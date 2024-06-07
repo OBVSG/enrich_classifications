@@ -3,7 +3,7 @@ from os.path import basename
 import glob
 import requests
 import xml.etree.ElementTree as ET
-import enrich_cls
+from enrich_cls import create_notation_map, download_concordance, enrich_bib
 
 
 def main():
@@ -27,11 +27,11 @@ def main():
     DDC_OBV_ID = "ddc-obv"
 
     with requests.Session() as s:
-        ddc_bk_concordance = enrich_cls.download_concordance(s, DDC_BK_ID)
-        ddc_obv_concordance = enrich_cls.download_concordance(s, DDC_OBV_ID)
+        ddc_bk_concordance = download_concordance(s, DDC_BK_ID)
+        ddc_obv_concordance = download_concordance(s, DDC_OBV_ID)
 
-    ddc_bk_map = enrich_cls.create_notation_map(ddc_bk_concordance)
-    ddc_obv_map = enrich_cls.create_notation_map(ddc_obv_concordance)
+    ddc_bk_map = create_notation_map(ddc_bk_concordance)
+    ddc_obv_map = create_notation_map(ddc_obv_concordance)
 
     print(
         f"Downloaded {len(ddc_bk_map)} mappings for BK and {len(ddc_obv_map)} mappings for OBV"
@@ -43,7 +43,7 @@ def main():
         tree = ET.parse(xml_file)
         root = tree.getroot()
         marcrecord = root.find("./record")
-        new_marcrecord = enrich_cls.enrich_bib(
+        new_marcrecord = enrich_bib(
             marcrecord, ddc_to_bk=ddc_bk_map, ddc_to_obv=ddc_obv_map
         )
         if new_marcrecord:
