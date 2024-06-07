@@ -8,14 +8,21 @@ https://coli-conc.gbv.de/api/concordances/ddc-bk-1000-ubg
 
 one can enrich BK and OBV Classification for a given Marc XML `<record/>` Element.
 
-# Usage `script_alma_js.py`
+# Installation
 
-There is a `-h` switch to print a how-to-use message:
+* You can use [pipx](https://pipx.pypa.io/stable/installation/) to make this available from a local clone:
 
-`python script_alma_js.py -h`
+* From the repo root directory execute `pipx install .`
+
+
+# Usage 
+
+There is a `-h` switch for `alma_rest_bib_enricher` to print a how-to-use message:
+
+`alma_rest_bib_enricher -h`
 
 ## Execution
-`python script_alma_js.py input_folder/ output_folder/`
+`alma_rest_bib_enricher input_folder/ output_folder/`
 
 The input_folder should contain XML Files of [Alma APIs Rest Bib Objects](https://developers.exlibrisgroup.com/alma/apis/docs/xsd/rest_bib.xsd/?tags=GET)
 
