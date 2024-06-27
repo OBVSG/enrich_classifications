@@ -36,13 +36,13 @@ def create_notation_map(concordance: str) -> dict[str, list]:
     return notation_map
 
 
-def gen_datafield(tag: str, ind1: str, ind2: str, subfields: list) -> ET.Element:
+def gen_datafield(tag: str, ind1: str, ind2: str, subfields: list, namespace_uri: str) -> ET.Element:
     """Generate a datafield
     Subfields: list of tuples with (code, value) pairs
     """
-    df = ET.Element("datafield", {"tag": tag, "ind1": ind1, "ind2": ind2})
+    df = ET.Element(f"{namespace_uri}datafield", {"tag": tag, "ind1": ind1, "ind2": ind2})
     for code, value in subfields:
-        sf = ET.SubElement(df, "subfield", {"code": code})
+        sf = ET.SubElement(df, f"{namespace_uri}subfield", {"code": code})
         sf.text = value
     return df
 
@@ -51,21 +51,24 @@ def enrich_bib(
     bib_element: ET.Element,
     ddc_to_bk: dict,
     ddc_to_obv: dict,
+    namespace_uri = "{http://www.loc.gov/MARC21/slim}"
 ) -> ET.Element | None:
+    if not namespace_uri:
+        namespace_uri = ""
     update_flag = False
     df084_is_here = False
     df970_is_here = False
-    df084__fields = bib_element.findall("./datafield[@tag='084'][@ind1=' '][@ind2=' ']")
-    df9701_ = bib_element.find("./datafield[@tag='970'][@ind1='1'][@ind2=' ']")
+    df084__fields = bib_element.findall(f"./{namespace_uri}datafield[@tag='084'][@ind1=' '][@ind2=' ']")
+    df9701_ = bib_element.find(f"./{namespace_uri}datafield[@tag='970'][@ind1='1'][@ind2=' ']")
     df08204a = bib_element.find(
-        "./datafield[@tag='082'][@ind1='0'][@ind2='4']/subfield[@code='a']",
+        f"./{namespace_uri}datafield[@tag='082'][@ind1='0'][@ind2='4']/{namespace_uri}subfield[@code='a']",
     )
     for df084__ in df084__fields:
         if (
-            sf2 := df084__.find("./subfield[@code='2']")
+            sf2 := df084__.find(f"./{namespace_uri}subfield[@code='2']")
         ) is not None and sf2.text == "bkl":
             df084_is_here = True
-    if df9701_ is not None and df9701_.find("./subfield[@code='c']") is not None:
+    if df9701_ is not None and df9701_.find(f"./{namespace_uri}subfield[@code='c']") is not None:
         df970_is_here = True
     if df08204a is not None:
         dewey = df08204a.text[:3]
@@ -85,6 +88,7 @@ def enrich_bib(
                                 "O: Automatisch generiert aus Konkordanz DDC-BK (UBG)",
                             ),
                         ],
+                        namespace_uri
                     ),
                 )
         if (obv_list := ddc_to_obv.get(dewey)) and not df970_is_here:
@@ -96,6 +100,7 @@ def enrich_bib(
                         "1",
                         " ",
                         [("c", fg)],
+                        namespace_uri
                     ),
                 )
     if update_flag:
