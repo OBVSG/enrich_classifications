@@ -44,7 +44,7 @@ def main():
         root = tree.getroot()
         marcrecord = root.find("./record")
         new_marcrecord = enrich_bib(
-            marcrecord, ddc_to_bk=ddc_bk_map, ddc_to_obv=ddc_obv_map
+            marcrecord, ddc_to_bk=ddc_bk_map, ddc_to_obv=ddc_obv_map, namespace_uri = None
         )
         if new_marcrecord:
             marcrecord = new_marcrecord
