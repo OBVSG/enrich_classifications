@@ -39,7 +39,7 @@ def main():
     counter = 0
     tree = ET.parse(args.input_marc_xml_file)
     root = tree.getroot()
-    ET.register_namespace("", "http://www.loc.gov/MARC21/slim")
+    ET.register_namespace("marc", "http://www.loc.gov/MARC21/slim")
 
     for marcrecord in root:
         new_marcrecord = enrich_bib(
